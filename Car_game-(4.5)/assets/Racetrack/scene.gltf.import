@@ -1,0 +1,87 @@
+[remap]
+
+importer="scene"
+importer_version=1
+type="PackedScene"
+uid="uid://bc4n6851qtv3d"
+path="res://.godot/imported/scene.gltf-16604a4869187803112bfebcc9de774e.scn"
+
+[deps]
+
+source_file="res://assets/Racetrack/scene.gltf"
+dest_files=["res://.godot/imported/scene.gltf-16604a4869187803112bfebcc9de774e.scn"]
+
+[params]
+
+nodes/root_type=""
+nodes/root_name=""
+nodes/root_script=null
+nodes/apply_root_scale=true
+nodes/root_scale=1.0
+nodes/import_as_skeleton_bones=false
+nodes/use_name_suffixes=true
+nodes/use_node_type_suffixes=true
+meshes/ensure_tangents=true
+meshes/generate_lods=true
+meshes/create_shadow_meshes=true
+meshes/light_baking=1
+meshes/lightmap_texel_size=0.2
+meshes/force_disable_compression=false
+skins/use_named_skins=true
+animation/import=true
+animation/fps=30
+animation/trimming=false
+animation/remove_immutable_tracks=true
+animation/import_rest_as_RESET=false
+import_script/path=""
+materials/extract=0
+materials/extract_format=0
+materials/extract_path=""
+_subresources={
+"nodes": {
+"PATH:Sketchfab_model/root/GLTF_SceneRootNode/car 2_3": {
+"import/skip_import": true
+},
+"PATH:Sketchfab_model/root/GLTF_SceneRootNode/car 3_1": {
+"import/skip_import": true
+},
+"PATH:Sketchfab_model/root/GLTF_SceneRootNode/car 3_1/Object_6": {
+"import/skip_import": true
+},
+"PATH:Sketchfab_model/root/GLTF_SceneRootNode/car 4_2": {
+"import/skip_import": true
+},
+"PATH:Sketchfab_model/root/GLTF_SceneRootNode/car 5_4": {
+"import/skip_import": true
+},
+"PATH:Sketchfab_model/root/GLTF_SceneRootNode/car 6_5": {
+"import/skip_import": true
+},
+"PATH:Sketchfab_model/root/GLTF_SceneRootNode/police car_12": {
+"import/skip_import": true
+},
+"PATH:Sketchfab_model/root/GLTF_SceneRootNode/wheel car_001_7": {
+"import/skip_import": true
+},
+"PATH:Sketchfab_model/root/GLTF_SceneRootNode/wheel car_002_8": {
+"import/skip_import": true
+},
+"PATH:Sketchfab_model/root/GLTF_SceneRootNode/wheel car_003_9": {
+"import/skip_import": true
+},
+"PATH:Sketchfab_model/root/GLTF_SceneRootNode/wheel car_004_10": {
+"import/skip_import": true
+},
+"PATH:Sketchfab_model/root/GLTF_SceneRootNode/wheel car_005_11": {
+"import/skip_import": true
+},
+"PATH:Sketchfab_model/root/GLTF_SceneRootNode/wheel car_006_13": {
+"import/skip_import": true
+},
+"PATH:Sketchfab_model/root/GLTF_SceneRootNode/wheel car_6": {
+"import/skip_import": true
+}
+}
+}
+gltf/naming_version=2
+gltf/embedded_image_handling=1
