@@ -1,0 +1,87 @@
+[gd_scene load_steps=8 format=3 uid="uid://cwfbsn5ghl23c"]
+
+[ext_resource type="Script" uid="uid://ddlliol085bh2" path="res://scripts/Menu_script.gd" id="1_upctu"]
+[ext_resource type="PackedScene" uid="uid://beribt3ce0mdl" path="res://scenes/car.tscn" id="2_11y2r"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_uubjt"]
+sky_top_color = Color(0.32134458, 0.0010666256, 0.5331424, 1)
+sky_horizon_color = Color(0, 0, 0, 1)
+sky_curve = 0.5223298
+sky_cover_modulate = Color(0, 0, 0, 1)
+ground_bottom_color = Color(0.23392546, 0.23392546, 0.23392543, 1)
+ground_horizon_color = Color(0, 0, 0, 1)
+ground_curve = 0.079999715
+energy_multiplier = 0.5
+
+[sub_resource type="Sky" id="Sky_5yleq"]
+sky_material = SubResource("ProceduralSkyMaterial_uubjt")
+
+[sub_resource type="Environment" id="Environment_ylpcl"]
+background_mode = 2
+sky = SubResource("Sky_5yleq")
+ambient_light_source = 1
+ssr_enabled = true
+ssr_depth_tolerance = 1.01
+ssao_enabled = true
+ssao_radius = 0.95
+ssao_intensity = 2.23
+ssao_power = 6.657411
+sdfgi_read_sky_light = false
+sdfgi_bounce_feedback = 0.22
+adjustment_enabled = true
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_5yleq"]
+size = Vector2(20, 20)
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_uubjt"]
+data = PackedVector3Array(10, 0, 5, -10, 0, 5, 10, 0, -5, -10, 0, 5, -10, 0, -5, 10, 0, -5)
+
+[node name="Node3D" type="Node3D"]
+script = ExtResource("1_upctu")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_ylpcl")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
+light_color = Color(0, 0, 0, 1)
+light_energy = 0.0
+shadow_enabled = true
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("PlaneMesh_5yleq")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="MeshInstance3D"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshInstance3D/StaticBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.030191422, -1.9073486e-06, 0.005867958)
+shape = SubResource("ConcavePolygonShape3D_uubjt")
+
+[node name="Car" parent="." instance=ExtResource("2_11y2r")]
+transform = Transform3D(0.73542327, 0, -0.6776079, 0, 1, 0, 0.6776079, 0, 0.73542327, 1.3113332, 0.7893493, 0.065010786)
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5154319, 8.197452)
+current = true
+fov = 30.0
+
+[node name="SpotLight3D" type="SpotLight3D" parent="."]
+transform = Transform3D(0.52877903, 0.3950768, -0.7512038, 1.5143697e-09, 0.8850607, 0.4654756, 0.84875953, -0.24613373, 0.46800157, -4.859533, 3.543473, 4.4614444)
+light_color = Color(1, 1, 0.8862745, 1)
+light_energy = 16.0
+shadow_enabled = true
+spot_range = 14.293658
+spot_angle = 20.390932
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Start_button" type="Button" parent="CanvasLayer"]
+anchors_preset = -1
+anchor_right = 0.026
+anchor_bottom = 0.020000001
+offset_left = 1496.0
+offset_top = 856.0
+offset_right = 1848.08
+offset_bottom = 996.4
+theme_override_font_sizes/font_size = 64
+text = "Start"

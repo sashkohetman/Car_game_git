@@ -3,18 +3,18 @@ class_name RaycastCar
 
 @export var wheels: Array[RaycastWheel]
 
-# Додаємо це назад! Саме цього рядка не вистачало для помилки
 @onready var total_wheels : int = wheels.size() 
 
 @export_group("Car Physics")
 @export var acceleration = 20000.0
 @export var max_speed := 200.0
 @export var body_mass := 1500.0
-@export var engine_braking := 0.1  # Наскільки сильно машина сама гальмує без газу
+@export var engine_braking := 0.1  # no gas = decelerate
 
 @export_group("Aerodynamics")
-@export var downforce_strength := 1.2
+@export var downforce_strength := 0.3
 @export var air_resistance := 0.02
+@export var aero_offset_z = -0.2
 
 @export_group("Steering Settings")
 @export var tire_max_turn_degrees := 30.0
@@ -24,21 +24,22 @@ class_name RaycastCar
 @export_group("Weight Distribution")
 @export var static_center_of_mass_offset := Vector3(0, -0.5, 0)
 @export var anti_roll_stiffness := 0.5 # Запобігає надмірному нахилу в поворотах
-@export var dynamic_weight_shift := 0.2 
+@export var dynamic_weight_shift := 0.2
 
 @export_group("Braking System")
-@export_range(0.0, 1.0) var brake_bias := 0.6 # 0.6 = стабільність, 0.4 = надлишкова повертаність
-@export var abs_enabled := true # Якщо хочеш, щоб колеса не блокувалися повністю
+@export_range(0.0, 1.0) var brake_bias := 0.6 # 0.6 = stable, 0.4 = oversteer
+@export var abs_enabled := true # isn't a thing for now
 
 
 @export_group("Air Control")
-@export var air_pitch_force := 5.0
-@export var air_roll_force := 2.5
+@export var air_pitch_force := 2.5
+@export var air_roll_force := 1.25
 
 @export_group("Effects")
 @export var skid_marks: Array[GPUParticles3D]
-@export var skid_marks_threshold := 10.0
+@export var skid_marks_threshold := 10.0 # sensetivity of producing skid marks
 
+#Speedometer stuff
 var timer = Timer
 var speed_update_interval := 0.1
 var time_since_last_speed_update := 0.0
@@ -63,12 +64,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		motor_input = 1
 	elif event.is_action_released("accelerate"):
 		motor_input = 0
-	#if event.is_action_pressed("decelerate"):
-		#motor_input = -1
-	#elif event.is_action_released("decelerate"):
-		#motor_input = 0
 
-		
 
 	
 		
@@ -77,13 +73,13 @@ func _physics_process(delta: float) -> void:
 	
 	if wheels.is_empty(): return 
 
-	# 1. Динамічне зміщення центру мас
+	# 1. Dynamic center of mass shift
 	if motor_input > 0:
 		center_of_mass.z = -dynamic_weight_shift 
 	else:
 		center_of_mass.z = 0.0
 	
-	# 2. Оновлення коліс
+	# 2. Wheels update
 	var is_grounded = false
 	var id := 0
 	for wheel in wheels:
@@ -110,30 +106,37 @@ func _physics_process(delta: float) -> void:
 				skid_marks[id].emitting = false
 		id += 1 
 
-	# 3. Аеродинаміка (опір повітря) - працює завжди
+	# 3. Aeordynamics
 	var air_drag_force = -linear_velocity.normalized() * linear_velocity.length_squared() * air_resistance
 	apply_central_force(air_drag_force)
 
-	# 4. Сили, що залежать від контакту з землею
+	# 4. Force, that depends if the wheel collides
 	var forward_speed = global_basis.z.dot(linear_velocity) # Оголошуємо ТУТ, щоб бачили всі блоки нижче
+	var final_accel = acceleration
+
+	if hand_break:
+		# Reduce engine power by 70% if handbrake is on
+		final_accel *= 0.3 
+
+# Then use final_accel instead of acceleration for wheel forces
+	# using global_basis.y, to press the car down
+	var down_direction = -global_basis.y 
 
 	if is_grounded:
-		# Притискна сила
-		var downforce = -global_basis.y * abs(forward_speed) * downforce_strength * mass
-		apply_central_force(downforce)
-		
-		# Гальмування двигуном
-		if motor_input == 0:
-			var engine_brake_force = -global_basis.z * forward_speed * engine_braking * mass
-			apply_central_force(engine_brake_force)
+		var downforce_mag = abs(forward_speed) * downforce_strength * mass
+		var downforce_vec = -global_basis.y * downforce_mag
+	
+	# Instead of apply_central_force, applying the downforce slightly behind the center of mass (for example, -0.5 meters)
+		var aero_offset = Vector3(0, 0, -0.5) # Minus, because Z+ is da hood , meaning that Z- is the spoiler axis
+		apply_force(downforce_vec, global_basis * Vector3(0, 0, aero_offset_z))
 	else:
-		# Керування в повітрі
+		# air controlls
 		var pitch = Input.get_axis("accelerate", "brake") * air_pitch_force
 		var roll = Input.get_axis("turn left", "turn right") * air_roll_force
 		apply_torque(global_basis.x * pitch * mass)
 		apply_torque(global_basis.z * roll * mass)
 
-	# 5. UI Таймер
+	# 5. Ui timer
 	time_since_last_speed_update += delta
 	if time_since_last_speed_update >= speed_update_interval:
 		speed_changed.emit(current_speed_kmh)
