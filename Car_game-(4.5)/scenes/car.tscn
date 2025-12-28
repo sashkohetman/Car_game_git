@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://beribt3ce0mdl"]
+[gd_scene load_steps=18 format=3 uid="uid://beribt3ce0mdl"]
 
 [ext_resource type="Script" uid="uid://ci8lwcgrti7eb" path="res://scripts/rigid_body_3d.gd" id="1_11fu8"]
 [ext_resource type="Script" uid="uid://c3e7ytdhfqn6u" path="res://scripts/raycast_wheel.gd" id="3_3v5ui"]
@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://btwi5nktaiavp" path="res://assets/Wheels.glb" id="4_rgthg"]
 [ext_resource type="Curve" uid="uid://dytobijit2ddd" path="res://scripts/accel_curve.tres" id="5_vbced"]
 [ext_resource type="Script" uid="uid://exm8oblwxyw" path="res://scripts/car_follow_camera.gd" id="7_26f0e"]
+[ext_resource type="Script" uid="uid://cl3vy6ppxd2y7" path="res://scenes/engine_processing.gd" id="8_ctevm"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_4clw4"]
 friction = 0.05
@@ -190,3 +191,6 @@ transform = Transform3D(-1, 0, 8.74228e-08, 2.11006e-08, 0.970435, 0.241363, -8.
 top_level = true
 current = true
 script = ExtResource("7_26f0e")
+
+[node name="Engine" type="Node3D" parent="."]
+script = ExtResource("8_ctevm")

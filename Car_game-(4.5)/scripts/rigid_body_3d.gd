@@ -11,6 +11,17 @@ class_name RaycastCar
 @export var body_mass := 1500.0
 @export var engine_braking := 0.1  # no gas = decelerate
 
+@export_group("Engine & Transmission")
+@export var engine_torque_curve: Curve       # Torque curve (x: RPM/MaxRPM, y: Torque)
+@export var max_torque := 450.0              # Peak torque in Nm
+@export var max_rpm := 7000.0                # Redline
+@export var idle_rpm := 900.0                # RPM when not pressing gas
+@export var gear_ratios: Array[float] = [3.4, 2.1, 1.45, 1.1, 0.9] # Eclipse 5-speed
+@export var final_drive := 4.1               # Differential ratio
+
+var current_rpm := 0.0
+var current_gear := 1 # 0 = Reverse, 1-5 = Forward
+
 @export_group("Aerodynamics")
 @export var downforce_strength := 0.3
 @export var air_resistance := 0.02
@@ -64,8 +75,28 @@ func _unhandled_input(event: InputEvent) -> void:
 		motor_input = 1
 	elif event.is_action_released("accelerate"):
 		motor_input = 0
+	if event.is_action_pressed("shift_up"):
+		current_gear = clampi(current_gear + 1, 1, gear_ratios.size())
+	if event.is_action_pressed("shift_down"):
+		current_gear = clampi(current_gear - 1, 1, gear_ratios.size())
 
-
+func calculate_engine_force() -> float:
+	if wheels.is_empty(): return 0.0
+	
+	# --- SAFETY CHECK ---
+	if not engine_torque_curve:
+		# If curve is missing, return a basic value or log a warning
+		# push_warning("Engine Torque Curve is missing!")
+		return motor_input * max_torque * 5.0 
+	
+	# ... rest of the code ...
+	var rpm_normalized = current_rpm / max_rpm
+	var torque_factor = engine_torque_curve.sample_baked(rpm_normalized)
+	
+	# Total force calculation
+	var wheel_force = (motor_input * max_torque * torque_factor * gear_ratios[current_gear - 1] * final_drive) / 0.33
+	
+	return wheel_force
 	
 		
 func _physics_process(delta: float) -> void:
@@ -118,7 +149,6 @@ func _physics_process(delta: float) -> void:
 		# Reduce engine power by 70% if handbrake is on
 		final_accel *= 0.3 
 
-# Then use final_accel instead of acceleration for wheel forces
 	# using global_basis.y, to press the car down
 	var down_direction = -global_basis.y 
 
@@ -131,10 +161,18 @@ func _physics_process(delta: float) -> void:
 		apply_force(downforce_vec, global_basis * Vector3(0, 0, aero_offset_z))
 	else:
 		# air controlls
-		var pitch = Input.get_axis("accelerate", "brake") * air_pitch_force
+		var pitch = Input.get_axis("brake", "accelerate") * air_pitch_force
 		var roll = Input.get_axis("turn left", "turn right") * air_roll_force
 		apply_torque(global_basis.x * pitch * mass)
 		apply_torque(global_basis.z * roll * mass)
+	
+	## 5. Engine
+	var engine_power = calculate_engine_force()
+
+	for wheel in wheels:
+		# If AWD, split power 50/50. If FWD, give only to front wheels.
+		if wheel.is_motor:
+			wheel.engine_force = engine_power / 2.0 # Splitting for AWD
 
 	# 5. Ui timer
 	time_since_last_speed_update += delta

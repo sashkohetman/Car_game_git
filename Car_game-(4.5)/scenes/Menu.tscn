@@ -85,3 +85,13 @@ offset_right = 1848.08
 offset_bottom = 996.4
 theme_override_font_sizes/font_size = 64
 text = "Start"
+
+[node name="Customisation" type="Button" parent="CanvasLayer"]
+offset_left = 860.0
+offset_top = 856.0
+offset_right = 1312.0
+offset_bottom = 1018.0
+theme_override_font_sizes/font_size = 46
+text = "Customisation"
+
+[node name="CanvasLayer2" type="CanvasLayer" parent="."]
