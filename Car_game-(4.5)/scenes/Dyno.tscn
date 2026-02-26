@@ -1,8 +1,8 @@
 [gd_scene load_steps=4 format=3 uid="uid://18sgogicl8xu"]
 
-[ext_resource type="Script" uid="uid://dy3e73slres64" path="res://scenes/Dyno.gd" id="1_61ih3"]
+[ext_resource type="Script" path="res://scenes/Dyno.gd" id="1_61ih3"]
 [ext_resource type="PackedScene" uid="uid://beribt3ce0mdl" path="res://scenes/car.tscn" id="2_2y5jg"]
-[ext_resource type="Script" uid="uid://cl3vy6ppxd2y7" path="res://scenes/engine_processing.gd" id="3_xdfl4"]
+[ext_resource type="Script" uid="uid://cl3vy6ppxd2y7" path="res://scripts/engine_processing.gd" id="3_xdfl4"]
 
 [node name="World" type="Node3D"]
 

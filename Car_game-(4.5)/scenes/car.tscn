@@ -1,22 +1,16 @@
-[gd_scene load_steps=18 format=3 uid="uid://beribt3ce0mdl"]
+[gd_scene load_steps=16 format=3 uid="uid://beribt3ce0mdl"]
 
-[ext_resource type="Script" uid="uid://ci8lwcgrti7eb" path="res://scripts/rigid_body_3d.gd" id="1_11fu8"]
+[ext_resource type="Script" uid="uid://ieq8o2p0r88t" path="res://scripts/RaycastCar.gd" id="1_ctevm"]
 [ext_resource type="Script" uid="uid://c3e7ytdhfqn6u" path="res://scripts/raycast_wheel.gd" id="3_3v5ui"]
 [ext_resource type="PackedScene" uid="uid://cupl0n6550c80" path="res://assets/uploads_files_3927428_Mitsubishi+Eclipse.glb" id="3_4clw4"]
 [ext_resource type="Curve" uid="uid://mrxswbyimb0f" path="res://scripts/Grip_curve.tres" id="4_ja1ir"]
 [ext_resource type="PackedScene" uid="uid://btwi5nktaiavp" path="res://assets/Wheels.glb" id="4_rgthg"]
-[ext_resource type="Curve" uid="uid://dytobijit2ddd" path="res://scripts/accel_curve.tres" id="5_vbced"]
 [ext_resource type="Script" uid="uid://exm8oblwxyw" path="res://scripts/car_follow_camera.gd" id="7_26f0e"]
-[ext_resource type="Script" uid="uid://cl3vy6ppxd2y7" path="res://scenes/engine_processing.gd" id="8_ctevm"]
+[ext_resource type="Script" uid="uid://cl3vy6ppxd2y7" path="res://scripts/engine_processing.gd" id="8_ctevm"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_4clw4"]
 friction = 0.05
 absorbent = true
-
-[sub_resource type="Curve" id="Curve_4clw4"]
-_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.2, 0.6), -1.2022473, -1.2022473, 0, 0, Vector2(0.6, 0.2), -0.15667592, -0.15667592, 0, 0, Vector2(1, 0.1), 0.0, 0.0, 0, 0]
-point_count = 4
-metadata/_snap_enabled = true
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_5ln72"]
 size = Vector3(1.8, 0.7114258, 4.25)
@@ -47,7 +41,7 @@ size = Vector2(0.15, 0.1)
 
 [node name="Car" type="Node3D"]
 
-[node name="RaycastCar" type="RigidBody3D" parent="." node_paths=PackedStringArray("wheels", "skid_marks")]
+[node name="RaycastCar" type="RigidBody3D" parent="." node_paths=PackedStringArray("wheels", "engine")]
 process_physics_priority = -1
 mass = 1500.0
 physics_material_override = SubResource("PhysicsMaterial_4clw4")
@@ -56,12 +50,10 @@ can_sleep = false
 continuous_cd = true
 contact_monitor = true
 max_contacts_reported = 4
-linear_damp = 0.1
-angular_damp = 2.0
-script = ExtResource("1_11fu8")
+script = ExtResource("1_ctevm")
 wheels = [NodePath("WheelFL"), NodePath("WheelFR"), NodePath("WheelRL"), NodePath("WheelRR")]
-steering_sensitivity_curve = SubResource("Curve_4clw4")
-skid_marks = [NodePath("Skidmarks/GPUParticles3D"), NodePath("Skidmarks/GPUParticles3D2"), NodePath("Skidmarks/GPUParticles3D3"), NodePath("Skidmarks/GPUParticles3D4")]
+engine = NodePath("../Engine")
+static_center_of_mass_offset = Vector3(0, -0.2, -0.2)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="RaycastCar"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.29446006, 0)
@@ -70,16 +62,15 @@ shape = SubResource("BoxShape3D_5ln72")
 [node name="uploads_files_3927428_Mitsubishi+Eclipse" parent="RaycastCar" instance=ExtResource("3_4clw4")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.215, -0.4092145, 0)
 
-[node name="WheelFL" type="RayCast3D" parent="RaycastCar" node_paths=PackedStringArray("shapecast")]
+[node name="WheelFL" type="RayCast3D" parent="RaycastCar" node_paths=PackedStringArray("engine", "shapecast")]
 process_physics_priority = -1
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 0, 1.2502872)
 collide_with_areas = true
 script = ExtResource("3_3v5ui")
+engine = NodePath("../../Engine")
 shapecast = NodePath("ShapeCast3D")
-z_brake_traction = 0.285
 is_steer = true
 grip_curve = ExtResource("4_ja1ir")
-accel_curve = ExtResource("5_vbced")
 
 [node name="Wheels" parent="RaycastCar/WheelFL" instance=ExtResource("4_rgthg")]
 transform = Transform3D(-3.934025e-08, 0, -0.9, 0, 0.9, 0, 0.9, 0, -3.934025e-08, 0, 0, 0)
@@ -90,15 +81,16 @@ transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 
 shape = SubResource("CylinderShape3D_lgesv")
 target_position = Vector3(0, -0.125, 0)
 
-[node name="WheelFR" type="RayCast3D" parent="RaycastCar" node_paths=PackedStringArray("shapecast")]
+[node name="WheelFR" type="RayCast3D" parent="RaycastCar" node_paths=PackedStringArray("engine", "shapecast")]
 process_physics_priority = -1
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6, 0, 1.25)
+enabled = false
 collide_with_areas = true
 script = ExtResource("3_3v5ui")
+engine = NodePath("../../Engine")
 shapecast = NodePath("ShapeCast3D")
 is_steer = true
 grip_curve = ExtResource("4_ja1ir")
-accel_curve = ExtResource("5_vbced")
 
 [node name="Wheels" parent="RaycastCar/WheelFR" instance=ExtResource("4_rgthg")]
 transform = Transform3D(-3.934025e-08, 0, 0.9, 0, 0.9, 0, -0.9, 0, -3.934025e-08, 0, 0, 0)
@@ -109,16 +101,15 @@ transform = Transform3D(-4.37114e-08, 1, -4.37114e-08, 0, -4.37114e-08, -1, -1, 
 shape = SubResource("CylinderShape3D_lgesv")
 target_position = Vector3(0, -0.125, 0)
 
-[node name="WheelRL" type="RayCast3D" parent="RaycastCar" node_paths=PackedStringArray("shapecast")]
+[node name="WheelRL" type="RayCast3D" parent="RaycastCar" node_paths=PackedStringArray("engine", "shapecast")]
 process_physics_priority = -1
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 0, -1.25)
 collide_with_areas = true
 script = ExtResource("3_3v5ui")
+engine = NodePath("../../Engine")
 shapecast = NodePath("ShapeCast3D")
-slip_limit_high_speed = 0.5
 is_motor = true
 grip_curve = ExtResource("4_ja1ir")
-accel_curve = ExtResource("5_vbced")
 
 [node name="Wheels" parent="RaycastCar/WheelRL" instance=ExtResource("4_rgthg")]
 transform = Transform3D(-3.934025e-08, 0, -0.9, 0, 0.9, 0, 0.9, 0, -3.934025e-08, 0, 0, 0)
@@ -129,16 +120,15 @@ transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 
 shape = SubResource("CylinderShape3D_lgesv")
 target_position = Vector3(0, -0.125, 0)
 
-[node name="WheelRR" type="RayCast3D" parent="RaycastCar" node_paths=PackedStringArray("shapecast")]
+[node name="WheelRR" type="RayCast3D" parent="RaycastCar" node_paths=PackedStringArray("engine", "shapecast")]
 process_physics_priority = -1
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6, 0, -1.25)
 collide_with_areas = true
 script = ExtResource("3_3v5ui")
+engine = NodePath("../../Engine")
 shapecast = NodePath("ShapeCast3D")
-slip_limit_high_speed = 0.5
 is_motor = true
 grip_curve = ExtResource("4_ja1ir")
-accel_curve = ExtResource("5_vbced")
 
 [node name="Wheels" parent="RaycastCar/WheelRR" instance=ExtResource("4_rgthg")]
 transform = Transform3D(-3.934025e-08, 0, 0.9, 0, 0.9, 0, -0.9, 0, -3.934025e-08, 0, 0, 0)
